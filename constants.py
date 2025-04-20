@@ -3,42 +3,20 @@
 from utils import versus_distance
 
 # https://en.wikipedia.org/wiki/Surround_sound
-SPEAKER_NAMES = ['FL', 'FR', 'FC', 'BL', 'BR', 'SL', 'SR']
+SPEAKER_NAMES = ['FL', 'FR', 'FC', 'BL', 'BR', 'SL', 'SR', 'WL', 'WR', 'TFL', 'TFR', 'TSL', 'TSR', 'TBL', 'TBR']
 
 SPEAKER_PATTERN = f'({"|".join(SPEAKER_NAMES + ["X"])})'
 SPEAKER_LIST_PATTERN = r'{speaker_pattern}+(,{speaker_pattern})*'.format(speaker_pattern=SPEAKER_PATTERN)
 
-SPEAKER_ANGLES = {
-    'FL': 30,
-    'FR': -30,
-    'FC': 0,
-    'BL': 150,
-    'BR': -150,
-    'SL': 90,
-    'SR': -90
-}
-
-# Speaker delays relative to the nearest speaker
-SPEAKER_DELAYS = {
-    _speaker: versus_distance(angle=abs(SPEAKER_ANGLES[_speaker]), ear='primary')[1] for _speaker in SPEAKER_NAMES
-}
-for _speaker in SPEAKER_DELAYS.keys():
-    SPEAKER_DELAYS[_speaker] -= min(*SPEAKER_DELAYS.values())
+SPEAKER_DELAYS = { _speaker: 0 for _speaker in SPEAKER_NAMES }
 
 # Each channel, left and right
 IR_ORDER = []
-# SPL change relative to middle of the head
-IR_ROOM_SPL = dict()
-for _speaker in SPEAKER_NAMES:
-    if _speaker not in IR_ROOM_SPL:
-        IR_ROOM_SPL[_speaker] = dict()
-    for _side in ['left', 'right']:
-        IR_ORDER.append(f'{_speaker}-{_side}')
-        IR_ROOM_SPL[_speaker][_side] = versus_distance(
-            angle=abs(SPEAKER_ANGLES[_speaker]),
-            ear='primary' if _side[0] == _speaker.lower()[1] else 'secondary'
-        )[2]
-
+# SPL change relative to middle of the head - disable
+IR_ROOM_SPL =  {
+    sp: {'left': 0.0, 'right': 0.0}
+    for sp in SPEAKER_NAMES
+}
 COLORS = {
     'lightblue': '#7db4db',
     'blue': '#1f77b4',
@@ -50,8 +28,12 @@ COLORS = {
 }
 
 HESUVI_TRACK_ORDER = ['FL-left', 'FL-right', 'SL-left', 'SL-right', 'BL-left', 'BL-right', 'FC-left', 'FR-right',
-                      'FR-left', 'SR-right', 'SR-left', 'BR-right', 'BR-left', 'FC-right']
+                      'FR-left', 'SR-right', 'SR-left', 'BR-right', 'BR-left', 'FC-right', 'WL-left', 'WL-right', 'WR-left', 'WR-right', 'TFL-left', 'TFL-right',
+                             'TFR-left', 'TFR-right', 'TSL-left', 'TSL-right', 'TSR-left', 'TSR-right',
+                             'TBL-left', 'TBR-right']
 
 HEXADECAGONAL_TRACK_ORDER = ['FL-left', 'FL-right', 'FR-left', 'FR-right', 'FC-left', 'FC-right', 'LFE-left',
                              'LFE-right', 'BL-left', 'BL-right', 'BR-left', 'BR-right', 'SL-left', 'SL-right',
-                             'SR-left', 'SR-right']
+                             'SR-left', 'SR-right', 'WL-left', 'WL-right', 'WR-left', 'WR-right', 'TFL-left', 'TFL-right',
+                             'TFR-left', 'TFR-right', 'TSL-left', 'TSL-right', 'TSR-left', 'TSR-right',
+                             'TBL-left', 'TBR-right']
