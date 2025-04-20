@@ -24,19 +24,27 @@ Therefore, it now supports processing of WL, WR.wav / TFL, TFR.wav / TSL, TSR.wa
 In any case, since HeSuVi’s code does not support 16 channels, the code must be written manually.)
 
 
-### 2 ###
+# 2 ###
+##![002](https://github.com/user-attachments/assets/f90fda17-ce6e-495c-8c04-370dedfa4f0f)
+(예시이미지의 위는 원본코드, 아래는 수정코드 적용입니다.)
 임펄스 피크감지는 뛰어나지만, 때로는 문제가 없는 임펄스도 타이밍 변조를 합니다.
 그러한 부분은 정위감,선명도의 하락으로 이어지며 그에 대한 정렬이 확실하게 적용될수있도록 변경했습니다.
 
+(In the example image, the top shows the original code, and the bottom shows the revised code.)
 Impulse peak detection is excellent, but sometimes it alters the timing of impulses that are actually fine.
 This leads to a degradation in localization and clarity, so I made adjustments to ensure proper alignment is consistently applied.
 
 
 ### 3 ###
+![002](https://github.com/user-attachments/assets/fe8996ad-0998-406d-a9a1-4ef679809b64)
+![003](https://github.com/user-attachments/assets/19127f81-ef8d-44c0-b601-55df5d3f0760)
+(예시이미지의 위는 원본코드, 아래는 수정코드 적용입니다. 의도적으로 같은 채널을 이름만 다르게 하여 서라운드 채널로 할당한 것이며, 이것은 애초에 같은 채널이기때문에 딜레이가 같아야함을 보여주기위한 예시입니다.)
 서라운드 채널간에 딜레이 및 게인 조절을 비활성화 합니다.
 이상적인 몰입형오디오쪽에서는 매우 미세한 단위로도 정확하게 매칭되는 것을 권장하기도합니다. - 특히나 이것은 근거리(약1m)의 경우에 더욱 명확합니다.
 바이노럴 기준으로 96000샘플레이트 기준 10us까지도 사람은 인지할수있으며 이것을 재생단에서 굳이 딜레이를 추가할 이유가 없기때문에 비활성화합니다.
 
+
+(In the example image, the upper part shows the original code, and the lower part shows the modified code applied. It intentionally assigns the same channel under a different name as a surround channel to illustrate that, since it’s the same channel to begin with, its delay must be identical.)
 I disabled delay and gain adjustments between surround channels.
 In ideal immersive audio setups, it’s often recommended that channels be matched with extremely fine precision—this becomes even more critical at close listening distances (around 1 meter).
 In binaural playback, humans can perceive differences as small as 10 microseconds at a 96kHz sample rate,
@@ -44,6 +52,7 @@ so there’s no reason to add delay during playback—hence, the feature is disa
 
 
 ### 4 ###
+
 --c=10 혹은 --c=50 (ms단위) 를 입력하여 피크이전, 사전절단의 윈도잉을 정할수 있게끔 했습니다. 인수를 사용하지않으면 기본값으로 적용됩니다.
 SOTA 기준을 충족시키는 DRC를 잘 적용한다면 대부분의 사전링잉이 억제되지만, 그래도 최소한의 사전딜레이 확보가 되어야합니다.
 뿐만 아니라 Bacch와 같은 XTC를 수행할때에도 사전응답은 반드시 확보되어야 올바르게 작동됩니다.
@@ -56,6 +65,9 @@ Therefore, I included a pre-delay argument option so that users can adjust it as
 
 
 ### 5 ###
+![002](https://github.com/user-attachments/assets/744a8dc5-61ab-4d0c-bec4-9b2e26711755)
+![003](https://github.com/user-attachments/assets/b1e665b0-f0a9-44d1-9963-7179d1418516)
+
 하이패스를 우회합니다.
 기본 impulcifer의 문구에선 하이패스가 적용됩니다. (약 10-22hz까지)
 바이노럴 가상화에 이용되는 대부분의 헤드폰들은 올바르게 극저음을 재생하지 못합니다.
