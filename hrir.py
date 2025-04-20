@@ -5,6 +5,7 @@ import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal, fftpack
+from scipy.signal import correlate
 from PIL import Image
 from autoeq.frequency_response import FrequencyResponse
 from impulse_response import ImpulseResponse
@@ -198,7 +199,7 @@ class HRIR:
             itd = np.abs(peak_left - peak_right) / self.fs
 
             # Speaker channel delay
-            head = head_ms * self.fs // 1000
+            head = int(head_ms * self.fs / 1000)
             delay = int(np.round(SPEAKER_DELAYS[speaker] * self.fs)) + head  # Channel delay in samples
 
             if peak_left < peak_right:
@@ -259,7 +260,56 @@ class HRIR:
             for ir in pair.values():
                 ir.data = ir.data[:tail_ind]
                 ir.data *= np.concatenate([np.ones(len(ir.data) - len(window)), window])
+        
+    def align_ipsilateral_all(self,
+                              speaker_pairs=None,
+                              segment_ms=30):
+        if speaker_pairs is None:
+            speaker_pairs = [('FL','FR'),
+                             ('SL','SR'),
+                             ('BL','BR'),
+                             ('WL','WR'),
+                             ('TFL','TFR'),
+                             ('TSL','TSR'),
+                             ('TBL','TBR'),
+                             ('FC','FC')]
+            
+        fs = self.fs
+        seg_len = int(fs * segment_ms / 1000)
 
+        for sp1, sp2 in speaker_pairs:
+            if sp1 not in self.irs or sp2 not in self.irs:
+                continue
+
+            data1 = self.irs[sp1]['left'].data[:seg_len]
+            data2 = self.irs[sp2]['right'].data[:seg_len]
+
+            corr  = correlate(data1, data2, mode='full')
+            lags  = np.arange(-len(data1)+1, len(data1))
+            lag   = lags[np.argmax(corr)]
+
+            if lag > 0:
+                for side in ('left','right'):
+                    d = self.irs[sp2][side].data
+                    padded = np.concatenate((np.zeros(lag), d))[:len(d)]
+                    self.irs[sp2][side].data = padded
+
+            elif lag < 0:
+                neg = -lag
+                for side in ('left','right'):
+                    d = self.irs[sp1][side].data
+                    padded = np.concatenate((np.zeros(neg), d))[:len(d)]
+                    self.irs[sp1][side].data = padded
+                    
+
+
+
+
+
+
+ 
+
+    
     def channel_balance_firs(self, left_fr, right_fr, method):
         """Creates FIR filters for correcting channel balance
 
