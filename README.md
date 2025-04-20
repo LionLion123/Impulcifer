@@ -2,7 +2,7 @@
 ![gif_046](https://github.com/user-attachments/assets/7931c04d-c3ad-4cd5-8f58-84ee40d7bb83)
 ![gif_047](https://github.com/user-attachments/assets/3ea1cc5b-8bbc-4f92-9b61-71bab0252e3e)
 
-한국 스피커갤러리/BRIR갤러리
+한국 스피커갤러리/BRIR갤러리에서 활동합니다.
 
 Impulcifer는 Jaakko Pasanen의 소프트웨어입니다.
 오랜기간 HRIR/BRIR에 대한 다양한 시도를 하고, 그러한 경험중에 꽤 많은 아이디어 혹은 불편한 부분, 몇가지 문제가 있었지만 개발자는 현재 바쁘기때문에 제가 원하는 요소를 한국 유저들과 공유하기 위해 이렇게 만들어봅니다.
@@ -14,7 +14,9 @@ After many years of experimenting with HRIR/BRIR, I came up with quite a few ide
 
 
 ### 1 ###
-cavern의 소프트웨어+VBcable 16ch로 Atmos 및 높이채널 업믹스에 대한 활용도가 더욱 넓어졌습니다. 따라서 WL,WR.wav / TFL,TFR.wav / TSL,TSR.wav / TBL,TBR.wav 까지 모두 처리될수있도록 합니다. (hrir.wav의 순서를 그대로 사용하면 되기때문에 hrir.wav는 순서에 맞게 하였고, hesuvi.wav는 제가 쓰기 편하게끔 해놨습니다. 어차피 hesuvi코드로는 16채널이 되지않기때문에 직접 코드를 작성해야합니다.)
+cavern의 소프트웨어+VBcable 16ch로 Atmos 및 높이채널 업믹스에 대한 활용도가 더욱 넓어졌습니다.
+따라서 WL,WR.wav / TFL,TFR.wav / TSL,TSR.wav / TBL,TBR.wav 까지 모두 처리될수있도록 합니다.
+(hrir.wav의 순서를 그대로 사용하면 되기때문에 hrir.wav는 순서에 맞게 하였고, hesuvi.wav는 제가 쓰기 편하게끔 해놨습니다. 어차피 hesuvi코드로는 16채널이 되지않기때문에 직접 코드를 작성해야합니다.)
 
 By combining Cavern's software with VB-Cable 16ch, the usability for Atmos and height channel upmixing has been greatly expanded.
 Therefore, it now supports processing of WL, WR.wav / TFL, TFR.wav / TSL, TSR.wav / TBL, TBR.wav.
@@ -56,7 +58,8 @@ Therefore, I included a pre-delay argument option so that users can adjust it as
 ### 5 ###
 하이패스를 우회합니다.
 기본 impulcifer의 문구에선 하이패스가 적용됩니다. (약 10-22hz까지)
-바이노럴 가상화에 이용되는 대부분의 헤드폰들은 올바르게 극저음을 재생하지 못합니다. 그렇기때문에 불필요한 부스트를 막기위한 개발자의 의도는 이해됩니다.
+바이노럴 가상화에 이용되는 대부분의 헤드폰들은 올바르게 극저음을 재생하지 못합니다.
+그렇기때문에 불필요한 부스트를 막기위한 개발자의 의도는 이해됩니다.
 하지만 그럼에도 더 깊게 탐구하며 가상의 공간까지 창조하는 고급유저들 대부분은 그들의 응답 자체가 마음대로 변조되는 것을 원하지 않습니다.
 또한 이미 룸응답에서도 이상적인 미니멈페이즈(DC제거된)의 형태를 기반으로 DRC가 적용되기때문에 이에 대한 부분은 걱정이 없습니다.
 따라서 약 10-22hz에 적용되는 하이패스를 우회합니다.
