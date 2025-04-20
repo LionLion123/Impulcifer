@@ -34,6 +34,7 @@ def main(dir_path=None,
          tilt=0.0,
          do_room_correction=True,
          do_headphone_compensation=True,
+         head_ms=1,
          do_equalization=True):
     """"""
     if dir_path is None or not os.path.isdir(dir_path):
@@ -91,10 +92,17 @@ def main(dir_path=None,
 
     # Crop noise and harmonics from the beginning
     print('Cropping impulse responses...')
-    hrir.crop_heads()
-
-    # Crop noise from the tail
+    hrir.crop_heads(head_ms=head_ms)
+    hrir.align_ipsilateral_all(
+        speaker_pairs=[('FL','FR'), ('SL','SR'), ('BL','BR'),
+                        ('TFL','TFR'), ('TSL','TSR'), ('TBL','TBR'),
+                        ('FC','FC'), ('WL','WR')],
+        segment_ms=30
+    )
     hrir.crop_tails()
+
+  # 디버깅용 responses.wav 출력
+    hrir.write_wav(os.path.join(dir_path, 'responses.wav'))
 
     # Write multi-channel WAV file with sine sweeps for debugging
     hrir.write_wav(os.path.join(dir_path, 'responses.wav'))
@@ -361,7 +369,7 @@ def create_target(estimator, bass_boost_gain, bass_boost_fc, bass_boost_q, tilt)
         raw=[-80, -5, -1.6, -0.6, -0.2, 0, 0]
     )
     high_pass.interpolate(f_min=10, f_max=estimator.fs / 2, f_step=1.01)
-    target.raw += high_pass.raw
+    # target.raw += high_pass.raw
     return target
 
 
@@ -459,6 +467,8 @@ def write_readme(file_path, hrir, fs):
 
 def create_cli():
     arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--c', type=float, default=1,
+                            help='Retain headroom in milliseconds before the impulse peak. Default is 1 ms.')
     arg_parser.add_argument('--dir_path', type=str, required=True, help='Path to directory for recordings and outputs.')
     arg_parser.add_argument('--test_signal', type=str, default=argparse.SUPPRESS,
                             help='Path to sine sweep test signal or pickled impulse response estimator.')
@@ -549,6 +559,9 @@ def create_cli():
             for ch_t in args['decay'].split(','):
                 decay[ch_t.split(':')[0].upper()] = float(ch_t.split(':')[1]) / 1000
         args['decay'] = decay
+    if  'c' in args:
+        args['head_ms'] = args['c']
+        del args['c']
     return args
 
 
