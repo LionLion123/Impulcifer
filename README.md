@@ -2,26 +2,101 @@
 ![gif_046](https://github.com/user-attachments/assets/7931c04d-c3ad-4cd5-8f58-84ee40d7bb83)
 ![gif_047](https://github.com/user-attachments/assets/3ea1cc5b-8bbc-4f92-9b61-71bab0252e3e)
 
-한국 스피커갤러리/BRIR갤러리/Audiosciencereview에서 활동합니다.
+한국 스피커갤러리,BRIR갤러리/Audiosciencereview에서 활동합니다.
 
 https://gall.dcinside.com/mgallery/board/lists?id=speakers
 
 Impulcifer는 Jaakko Pasanen의 소프트웨어입니다.
+
+
 오랜기간 HRIR/BRIR에 대한 다양한 시도를 하고, 그러한 경험중에 꽤 많은 아이디어 혹은 불편한 부분, 몇가지 문제가 있었지만 개발자는 현재 바쁘기때문에 제가 원하는 요소를 한국 유저들과 공유하기 위해 이렇게 만들어봅니다.
 
+
+대부분은 GPT의 도움을 받아 직접 실행해보며 문제없는 부분만 반영합니다.
+
 Impulcifer is a software developed by Jaakko Pasanen.
-After many years of experimenting with HRIR/BRIR, I came up with quite a few ideas, experienced some inconveniences, and encountered a few issues. However, since the developer is currently busy, I decided to create this version to share the features I want with Korean users.
+After many years of experimenting with HRIR/BRIR, I came up with quite a few ideas, experienced some inconveniences, and encountered a few issues.
+
+However, since the developer is currently busy, I decided to create this version to share the features I want with Korean users.
+
+For the most part, I execute it myself with GPT’s help and only apply the parts that work without issues.
 
 -----------------------------------------------
 # Items under Consideration # 고려하고 있는 부분들
+-----------------------------------------------
 
 ### 1
-cavern의 소프트웨어+VBcable 16ch로 Atmos 및 높이채널 업믹스에 대한 활용도가 더욱 넓어졌습니다.
+가끔 처리하다보면 ValueError: cannot convert float NaN to integer 라는 에러가 발생할때가 있습니다.
 
 
+추측으로는 -60db아래 임펄스의 노이즈플로어부분에서 이상한 피크 같은게 있거나 할때 저러는 것 같습니다.
+
+
+대부분의 응답에선 발생하지 않지만 감쇠가 너무 빠른 응답을 재루프백했을 경우에도 종종 그러구요.
+
+
+몇년전 개발자에게 문의했었지만 바쁘기때문에 언젠간 직접 고치는게 나을듯합니다.
+
+
+Sometimes during processing, I encounter an error: ValueError: cannot convert float NaN to integer.
+
+
+I suspect this happens when there’s some strange peak in the noise floor of the impulse below –60 dB.
+
+
+It doesn’t occur in most responses, but it also happens occasionally when re-loopbacking a response with very fast attenuation.
+
+
+I asked the developer about this a few years ago, but since they’re busy, it’s probably better that I fix it myself someday.
+
+-----------------------------------------------
+
+
+### 2
+impulcifer의 채널밸런스 기능과는 별개로 녹음당시에 마이크착용,삽입깊이등의 편차로 인한 경우에는 왼쪽채널, 오른쪽채널이 아니라 왼쪽귀, 오른쪽귀 응답을 보정해야합니다.
+
+FL-L,FR-L / FR-R,FL-R 이렇게 말이죠. 이 기능을 REW의 MTW개념을 섞어서 극도로 짧은 게이팅을 대역별로 다르게 적용하여 착용 편차만을 보정하는 것은 REW에서 충분히 가능합니다.
+
+이 부분을 impulcifer 내부에도 적용시킬까 고민중입니다.
+
+
+Separately from Impulcifer’s channel balance function, when there are deviations in microphone placement or insertion depth during recording, you need to correct for left‑ear and right‑ear responses rather than left‑channel and right‑channel.
+
+
+In other words, FL‑L, FR‑L / FR‑R, FL‑R. In REW, it’s entirely possible to compensate solely for fit deviations by combining the MTW concept and applying ultrashort gating differently across frequency bands.
+
+
+I’m considering applying this approach within Impulcifer as well.
+
+
+-----------------------------------------------
+### 3
+BacchORC와 같은 바이노럴 룸보정(DRC) 기능을 적용해볼까 싶은 생각도 하고있습니다.
+
+impulcifer에 룸파일, 타겟등을 적용하여 룸이큐를 처리되게끔 할수도 있지만, 그것과는 별개로 바이노럴의 특징을 고려하여 개인의 좌우 신체편차를 보정하고
+
+더 나아가 각 스피커 각도에서 필연적으로 발생하는 귓바퀴의 착색을 DF(혹은 룸게인 가중치가 부여된 타겟)에 맞게 교정하여, 결과적으로 투명함을 얻을수 있고 스피커가 본질적으로 사라지게 됩니다.
+
+(스피커와 룸, 그리고 귓바퀴의 착색이 스피커가 있다는 것을 인지하게 하는 요소들입니다.)
+
+다만 이건 개인마다 DF의 차이가 분명히 존재하고, 개인마다 녹음 방법이 정확히 같지않기때문에 어떻게 공용화해서 적용시킬지는 고민중입니다.
+
+
+I’m also considering applying a binaural room correction (DRC) function like BacchORC.
+
+
+While it’s possible to process room EQ in Impulcifer by applying room files and targets, separately, by taking binaural characteristics into account, you can correct for individual left‑right anatomical variations and, furthermore, correct pinna coloration that inevitably occurs at each speaker angle to match the DF (or a target with room‑gain weighting). The result is transparency, effectively making the speakers disappear.
+
+
+(The speaker, the room, and pinna coloration are the elements that make us aware of the presence of speakers.)
+
+
+However, since DF differences clearly exist among individuals and recording methods aren’t exactly the same for everyone, I’m pondering how to generalize and apply this.
+
+
+-----------------------------------------------
 # Changes # 변경사항
-
-
+-----------------------------------------------
 ### 1 
 cavern의 소프트웨어+VBcable 16ch로 Atmos 및 높이채널 업믹스에 대한 활용도가 더욱 넓어졌습니다.
 
@@ -43,7 +118,7 @@ In any case, since HeSuVi’s code does not support 16 channels, the code must b
 -----------------------------------------------
 
 ### 2 
-##![002](https://github.com/user-attachments/assets/f90fda17-ce6e-495c-8c04-370dedfa4f0f)
+![002](https://github.com/user-attachments/assets/f90fda17-ce6e-495c-8c04-370dedfa4f0f)
 
 (예시이미지의 위는 원본코드, 아래는 수정코드 적용입니다.)
 
