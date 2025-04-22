@@ -35,6 +35,7 @@ def main(dir_path=None,
          do_room_correction=True,
          do_headphone_compensation=True,
          head_ms=1,
+         jamesdsp=False,
          do_equalization=True):
     """"""
     if dir_path is None or not os.path.isdir(dir_path):
@@ -185,6 +186,33 @@ def main(dir_path=None,
 
     # Write multi-channel WAV file with HeSuVi track order
     hrir.write_wav(os.path.join(dir_path, 'hesuvi.wav'), track_order=HESUVI_TRACK_ORDER)
+
+
+
+    if jamesdsp:
+        print('Generating jamesdsp.wav (FL/FR only, normalized to FL/FR)...')
+        import copy, contextlib, io
+
+        # 전체 HRIR 복사 후 FL/FR 외 모든 채널 제거
+        dsp_hrir = copy.deepcopy(hrir)
+        for sp in list(dsp_hrir.irs.keys()):
+            if sp not in ['FL', 'FR']:
+                del dsp_hrir.irs[sp]
+
+        with contextlib.redirect_stdout(io.StringIO()):
+            dsp_hrir.normalize(
+                peak_target=None if target_level is not None else -0.1,
+                avg_target=target_level
+            )
+
+        # FL‑L, FL‑R, FR‑L, FR‑R 순서로 파일 생성
+        jd_order = ['FL-left', 'FL-right', 'FR-left', 'FR-right']
+        out_path = os.path.join(dir_path, 'jamesdsp.wav')
+        dsp_hrir.write_wav(out_path, track_order=jd_order)
+
+
+
+
 
 
 def open_impulse_response_estimator(dir_path, file_path=None):
@@ -469,6 +497,8 @@ def create_cli():
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('--c', type=float, default=1,
                             help='Retain headroom in milliseconds before the impulse peak. Default is 1 ms.')
+    arg_parser.add_argument('--jamesdsp', action='store_true',
+                            help='Generate an additional jamesdsp.wav containing only FL/FR IRs.')    
     arg_parser.add_argument('--dir_path', type=str, required=True, help='Path to directory for recordings and outputs.')
     arg_parser.add_argument('--test_signal', type=str, default=argparse.SUPPRESS,
                             help='Path to sine sweep test signal or pickled impulse response estimator.')
