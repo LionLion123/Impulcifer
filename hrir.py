@@ -142,11 +142,8 @@ class HRIR:
         Args:
             peak_target: Target gain of the peak in dB
             avg_target: Target gain of the mid frequencies average in dB
-
-        Returns:
-            None
         """
-        # Stack and sum all left and right ear impulse responses separately
+        # 왼쪽과 오른쪽 IR을 합산하여 전체 신호 생성
         left = []
         right = []
         for speaker, pair in self.irs.items():
@@ -155,29 +152,31 @@ class HRIR:
         left = np.sum(np.vstack(left), axis=0)
         right = np.sum(np.vstack(right), axis=0)
 
-        # Calculate magnitude responses
+        # Magnitude response 계산
         f_l, mr_l = magnitude_response(left, self.fs)
         f_r, mr_r = magnitude_response(right, self.fs)
 
+        # gain 계산 (피크 또는 중역 평균 중 하나만 사용)
         if peak_target is not None and avg_target is None:
-            # Maximum absolute gain from both sides
             gain = np.max(np.vstack([mr_l, mr_r])) * -1 + peak_target
-
         elif peak_target is None and avg_target is not None:
-            # Mid frequencies average from both sides
             gain = np.mean(np.concatenate([
                 mr_l[np.logical_and(f_l > 80, f_l < 6000)],
                 mr_r[np.logical_and(f_r > 80, f_r < 6000)]
-            ]))
-            gain = gain * -1 + avg_target
-
+            ])) * -1 + avg_target
         else:
             raise ValueError('One and only one of the parameters "peak_target" and "avg_target" must be given!')
 
-        # Scale impulse responses
+        # 전체 정규화 gain만 출력
+        print(f">>>>>>>>> Applied a normalization gain of {gain:.2f} dB to all channels")
+
+        # 계산된 gain 적용
+        factor = 10 ** (gain / 20)
         for speaker, pair in self.irs.items():
-            for ir in pair.values():
-                ir.data *= 10 ** (gain / 20)
+            for side, ir in pair.items():
+                ir.data *= factor
+
+
 
     def crop_heads(self, head_ms=1):
         """Crops heads of impulse responses
@@ -438,7 +437,7 @@ class HRIR:
 
         # Group the same left and right side speakers
         eqir = HRIR(self.estimator)
-        for speakers in [['FC'], ['FL', 'FR'], ['SL', 'SR'], ['BL', 'BR']]:
+        for speakers in [['FC'], ['FL', 'FR'], ['SL', 'SR'], ['BL', 'BR'], ['WL', 'WR'], ['TFL', 'TFR'], ['TSL', 'TSR'], ['TBL', 'TBR']]:
             if len([ch for ch in speakers if ch in self.irs]) < len(speakers):
                 # All the speakers in the current speaker group must exist, otherwise balancing makes no sense
                 continue
