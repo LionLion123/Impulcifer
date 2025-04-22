@@ -30,10 +30,10 @@ COLORS = {
 HESUVI_TRACK_ORDER = ['FL-left', 'FL-right', 'SL-left', 'SL-right', 'BL-left', 'BL-right', 'FC-left', 'FR-right',
                       'FR-left', 'SR-right', 'SR-left', 'BR-right', 'BR-left', 'FC-right', 'WL-left', 'WL-right', 'WR-left', 'WR-right', 'TFL-left', 'TFL-right',
                              'TFR-left', 'TFR-right', 'TSL-left', 'TSL-right', 'TSR-left', 'TSR-right',
-                             'TBL-left', 'TBR-right']
+                             'TBL-left', 'TBL-right', 'TBR-left', 'TBR-right']
 
 HEXADECAGONAL_TRACK_ORDER = ['FL-left', 'FL-right', 'FR-left', 'FR-right', 'FC-left', 'FC-right', 'LFE-left',
                              'LFE-right', 'BL-left', 'BL-right', 'BR-left', 'BR-right', 'SL-left', 'SL-right',
                              'SR-left', 'SR-right', 'WL-left', 'WL-right', 'WR-left', 'WR-right', 'TFL-left', 'TFL-right',
                              'TFR-left', 'TFR-right', 'TSL-left', 'TSL-right', 'TSR-left', 'TSR-right',
-                             'TBL-left', 'TBR-right']
+                             'TBL-left', 'TBL-right', 'TBR-left', 'TBR-right']
