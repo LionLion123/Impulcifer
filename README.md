@@ -21,78 +21,6 @@ However, since the developer is currently busy, I decided to create this version
 
 For the most part, I execute it myself with GPT’s help and only apply the parts that work without issues.
 
------------------------------------------------
-# Items under Consideration # 고려하고 있는 부분들
------------------------------------------------
-
-### 1
-가끔 처리하다보면 ValueError: cannot convert float NaN to integer 라는 에러가 발생할때가 있습니다.
-
-
-추측으로는 -60db아래 임펄스의 노이즈플로어부분에서 이상한 피크 같은게 있거나 할때 저러는 것 같습니다.
-
-
-대부분의 응답에선 발생하지 않지만 감쇠가 너무 빠른 응답을 재루프백했을 경우에도 종종 그러구요.
-
-
-몇년전 개발자에게 문의했었지만 바쁘기때문에 언젠간 직접 고치는게 나을듯합니다.
-
-
-Sometimes during processing, I encounter an error: ValueError: cannot convert float NaN to integer.
-
-
-I suspect this happens when there’s some strange peak in the noise floor of the impulse below –60 dB.
-
-
-It doesn’t occur in most responses, but it also happens occasionally when re-loopbacking a response with very fast attenuation.
-
-
-I asked the developer about this a few years ago, but since they’re busy, it’s probably better that I fix it myself someday.
-
------------------------------------------------
-
-
-### 2
-impulcifer의 채널밸런스 기능과는 별개로 녹음당시에 마이크착용,삽입깊이등의 편차로 인한 경우에는 왼쪽채널, 오른쪽채널이 아니라 왼쪽귀, 오른쪽귀 응답을 보정해야합니다.
-
-FL-L,FR-L / FR-R,FL-R 이렇게 말이죠. 이 기능을 REW의 MTW개념을 섞어서 극도로 짧은 게이팅을 대역별로 다르게 적용하여 착용 편차만을 보정하는 것은 REW에서 충분히 가능합니다.
-
-이 부분을 impulcifer 내부에도 적용시킬까 고민중입니다.
-
-
-Separately from Impulcifer’s channel balance function, when there are deviations in microphone placement or insertion depth during recording, you need to correct for left‑ear and right‑ear responses rather than left‑channel and right‑channel.
-
-
-In other words, FL‑L, FR‑L / FR‑R, FL‑R. In REW, it’s entirely possible to compensate solely for fit deviations by combining the MTW concept and applying ultrashort gating differently across frequency bands.
-
-
-I’m considering applying this approach within Impulcifer as well.
-
-
------------------------------------------------
-### 3
-BacchORC와 같은 바이노럴 룸보정(DRC) 기능을 적용해볼까 싶은 생각도 하고있습니다.
-
-impulcifer에 룸파일, 타겟등을 적용하여 룸이큐를 처리되게끔 할수도 있지만, 그것과는 별개로 바이노럴의 특징을 고려하여 개인의 좌우 신체편차를 보정하고
-
-더 나아가 각 스피커 각도에서 필연적으로 발생하는 귓바퀴의 착색을 DF(혹은 룸게인 가중치가 부여된 타겟)에 맞게 교정하여, 결과적으로 투명함을 얻을수 있고 스피커가 본질적으로 사라지게 됩니다.
-
-(스피커와 룸, 그리고 귓바퀴의 착색이 스피커가 있다는 것을 인지하게 하는 요소들입니다.)
-
-다만 이건 개인마다 DF의 차이가 분명히 존재하고, 개인마다 녹음 방법이 정확히 같지않기때문에 어떻게 공용화해서 적용시킬지는 고민중입니다.
-
-
-I’m also considering applying a binaural room correction (DRC) function like BacchORC.
-
-
-While it’s possible to process room EQ in Impulcifer by applying room files and targets, separately, by taking binaural characteristics into account, you can correct for individual left‑right anatomical variations and, furthermore, correct pinna coloration that inevitably occurs at each speaker angle to match the DF (or a target with room‑gain weighting). The result is transparency, effectively making the speakers disappear.
-
-
-(The speaker, the room, and pinna coloration are the elements that make us aware of the presence of speakers.)
-
-
-However, since DF differences clearly exist among individuals and recording methods aren’t exactly the same for everyone, I’m pondering how to generalize and apply this.
-
 
 -----------------------------------------------
 # Changes # 변경사항
@@ -236,3 +164,105 @@ Furthermore, since DRC is already applied based on an ideal minimum-phase (DC-re
 
 
 Therefore, the high-pass filter applied around 10–22 Hz has been bypassed.
+
+
+-----------------------------------------------
+
+### 6
+--jamesdsp 인수를 입력하면 바로 제임스Dsp 앱에 사용할수있는 트루스테레오 IR파일이 만들어집니다. 파일명은 같은 폴더내에 jamesdsp.wav로 저장됩니다.
+
+
+폴더내에 FL,FR.wav를 제외한 다른 채널들의 파일이 있더라도, --jamesdsp를 입력하면 FL,FR만을 기준으로 정규화되어 스테레오 파일을 따로 만듭니다.
+
+
+When you supply the --jamesdsp argument, a TrueStereo IR file ready for use in the JamesDSP app is generated immediately. The file is saved in the same folder under the name jamesdsp.wav.
+
+
+Even if the folder contains files for channels other than FL.wav and FR.wav, using --jamesdsp will normalize based only on FL and FR and produce a separate stereo file.
+
+
+-----------------------------------------------
+# Items under Consideration # 고려하고 있는 부분들
+-----------------------------------------------
+
+### 1
+가끔 처리하다보면 ValueError: cannot convert float NaN to integer 라는 에러가 발생할때가 있습니다.
+
+
+추측으로는 -60db아래 임펄스의 노이즈플로어부분에서 이상한 피크 같은게 있거나 할때 저러는 것 같습니다.
+
+
+대부분의 응답에선 발생하지 않지만 감쇠가 너무 빠른 응답을 재루프백했을 경우에도 종종 그러구요.
+
+
+몇년전 개발자에게 문의했었지만 바쁘기때문에 언젠간 직접 고치는게 나을듯합니다.
+
+
+Sometimes during processing, I encounter an error: ValueError: cannot convert float NaN to integer.
+
+
+I suspect this happens when there’s some strange peak in the noise floor of the impulse below –60 dB.
+
+
+It doesn’t occur in most responses, but it also happens occasionally when re-loopbacking a response with very fast attenuation.
+
+
+I asked the developer about this a few years ago, but since they’re busy, it’s probably better that I fix it myself someday.
+
+-----------------------------------------------
+
+
+### 2
+impulcifer의 채널밸런스 기능과는 별개로 녹음당시에 마이크착용,삽입깊이등의 편차로 인한 경우에는 왼쪽채널, 오른쪽채널이 아니라 왼쪽귀, 오른쪽귀 응답을 보정해야합니다.
+
+FL-L,FR-L / FR-R,FL-R 이렇게 말이죠. 이 기능을 REW의 MTW개념을 섞어서 극도로 짧은 게이팅을 대역별로 다르게 적용하여 착용 편차만을 보정하는 것은 REW에서 충분히 가능합니다.
+
+이 부분을 impulcifer 내부에도 적용시킬까 고민중입니다.
+
+
+Separately from Impulcifer’s channel balance function, when there are deviations in microphone placement or insertion depth during recording, you need to correct for left‑ear and right‑ear responses rather than left‑channel and right‑channel.
+
+
+In other words, FL‑L, FR‑L / FR‑R, FL‑R. In REW, it’s entirely possible to compensate solely for fit deviations by combining the MTW concept and applying ultrashort gating differently across frequency bands.
+
+
+I’m considering applying this approach within Impulcifer as well.
+
+
+-----------------------------------------------
+### 3
+BacchORC와 같은 바이노럴 룸보정(DRC) 기능을 적용해볼까 싶은 생각도 하고있습니다.
+
+impulcifer에 룸파일, 타겟등을 적용하여 룸이큐를 처리되게끔 할수도 있지만, 그것과는 별개로 바이노럴의 특징을 고려하여 개인의 좌우 신체편차를 보정하고
+
+더 나아가 각 스피커 각도에서 필연적으로 발생하는 귓바퀴의 착색을 DF(혹은 룸게인 가중치가 부여된 타겟)에 맞게 교정하여, 결과적으로 투명함을 얻을수 있고 스피커가 본질적으로 사라지게 됩니다.
+
+(스피커와 룸, 그리고 귓바퀴의 착색이 스피커가 있다는 것을 인지하게 하는 요소들입니다.)
+
+다만 이건 개인마다 DF의 차이가 분명히 존재하고, 개인마다 녹음 방법이 정확히 같지않기때문에 어떻게 공용화해서 적용시킬지는 고민중입니다.
+
+
+I’m also considering applying a binaural room correction (DRC) function like BacchORC.
+
+
+While it’s possible to process room EQ in Impulcifer by applying room files and targets, separately, by taking binaural characteristics into account, you can correct for individual left‑right anatomical variations and, furthermore, correct pinna coloration that inevitably occurs at each speaker angle to match the DF (or a target with room‑gain weighting). The result is transparency, effectively making the speakers disappear.
+
+
+(The speaker, the room, and pinna coloration are the elements that make us aware of the presence of speakers.)
+
+
+However, since DF differences clearly exist among individuals and recording methods aren’t exactly the same for everyone, I’m pondering how to generalize and apply this.
+
+
+-----------------------------------------------
+### 4
+plot은 초기사용자들에게 나쁘지않은 정보들을 제공해주지만 기존의 plot들중 대부분은 잘 보지않게 되었고, 결국은 REW를 사용하여 확인합니다.
+
+
+BRIR사용자들에 제일 도움이 될만한 간단한 그래프는 일단 양이응답 임펄스 오버레이형태이지않을까 싶습니다. 더나아가 ILD,IPD,IACC,ETC 등의 지표도 같이 보여주면 좋을 것 같습니다. 
+
+
+Plots provide useful information for novice users, but most of the existing plots are seldom viewed, and users ultimately use REW to verify.
+
+
+The simplest graph that would be most helpful for BRIR users would probably be a stereo impulse response overlay. Furthermore, it would be beneficial to also display metrics such as ILD, IPD, IACC, and ETC.
