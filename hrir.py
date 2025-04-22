@@ -460,13 +460,13 @@ class HRIR:
 
     def plot(self,
              dir_path=None,
-             plot_recording=True,
-             plot_spectrogram=True,
-             plot_ir=True,
-             plot_fr=True,
-             plot_decay=True,
-             plot_waterfall=True,
-             close_plots=True):
+             plot_recording=False,
+             plot_spectrogram=False,
+             plot_ir=False,
+             plot_fr=False,
+             plot_decay=False,
+             plot_waterfall=False,
+             close_plots=False):
         """Plots all impulse responses."""
         # Plot and save max limits
         figs = dict()
