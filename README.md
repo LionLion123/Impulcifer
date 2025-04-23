@@ -195,13 +195,7 @@ Even if the folder contains files for channels other than FL.wav and FR.wav, usi
 --hangloose 인수를 입력하면 바로 Hangloose Convolver에  사용할수있는 각 채널 스테레오 IR파일들이 Hangloose라는 새로운 폴더에 만들어집니다.
 
 
-LFE용 응답은 FLFR에 로우패스를 적용하여 만들어집니다.
-
-
 When you specify the --hangloose argument, stereo IR files for each channel that can be used with the Hangloose Convolver are generated immediately in a new folder named “Hangloose.”
-
-The LFE response is created by applying a low-pass filter to the FL and FR channels.
-
 
 
 -----------------------------------------------
