@@ -2,6 +2,9 @@
 
 import os
 import re
+global copy
+import copy as _copy 
+from scipy.signal import butter, lfilter
 import argparse
 from tabulate import tabulate
 from datetime import datetime
@@ -36,6 +39,7 @@ def main(dir_path=None,
          do_headphone_compensation=True,
          head_ms=1,
          jamesdsp=False,
+         hangloose=False,
          do_equalization=True):
     """"""
     if dir_path is None or not os.path.isdir(dir_path):
@@ -210,6 +214,54 @@ def main(dir_path=None,
         out_path = os.path.join(dir_path, 'jamesdsp.wav')
         dsp_hrir.write_wav(out_path, track_order=jd_order)
 
+    if hangloose:
+        import numpy as np
+        from scipy.io import wavfile
+
+        output_dir = os.path.join(dir_path, 'hangloose')
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Hrir.wav 기준 최대 채널 순서
+        full_order = [
+            'FL','FR','FC','LFE','BL','BR','SL','SR',
+            'WL','WR','TFL','TFR','TSL','TSR','TBL','TBR'
+        ]
+        processed = [sp for sp in full_order if sp in hrir.irs]
+
+        # 1) 스피커별 WAV 생성 (FC도 포함)
+        for sp in processed:
+            single = _copy.deepcopy(hrir)
+            for other in list(single.irs.keys()):
+                if other != sp:
+                    del single.irs[other]
+
+            track_order = [f'{sp}-left', f'{sp}-right']
+            out_path     = os.path.join(output_dir, f'{sp}.wav')
+            single.write_wav(out_path, track_order=track_order)
+            print(f'[Hangloose] 생성됨: {out_path}')
+
+        # 2) FL.wav 과 FR.wav 읽어서 각각 LFEL.wav, LFR.wav 생성
+        for sp, out_name in [('FL', 'LFEL.wav'), ('FR', 'LFER.wav')]:
+            src_path = os.path.join(output_dir, f'{sp}.wav')
+            if not os.path.isfile(src_path):
+                continue
+
+            # 2.1) 읽기
+            fs_read, data = wavfile.read(src_path)  # data.shape == (N, 2)
+
+            # 2.2) 120 Hz 로우패스 필터 설계
+            b, a = butter(4, 120/(fs_read/2), btype='low', analog=False)
+            gain_lin = 10**(10/20)  # +10 dB
+
+            # 2.3) 좌/우 채널 필터링 + 게인 적용
+            filtered_l = lfilter(b, a, data[:, 0]) * gain_lin
+            filtered_r = lfilter(b, a, data[:, 1]) * gain_lin
+
+            # 2.4) 저장
+            out_path = os.path.join(output_dir, out_name)
+            lfe_data = np.vstack((filtered_l, filtered_r)).T.astype(data.dtype)
+            wavfile.write(out_path, fs_read, lfe_data)
+            print(f'[LFE 변환] 생성됨: {out_path}')
 
 
 
@@ -498,7 +550,9 @@ def create_cli():
     arg_parser.add_argument('--c', type=float, default=1,
                             help='Retain headroom in milliseconds before the impulse peak. Default is 1 ms.')
     arg_parser.add_argument('--jamesdsp', action='store_true',
-                            help='Generate an additional jamesdsp.wav containing only FL/FR IRs.')    
+                            help='Generate an additional jamesdsp.wav containing only FL/FR IRs.')
+    arg_parser.add_argument('--hangloose', action='store_true',
+                   help='채널별 Hangloose 파일(스피커별 좌/우 WAV) 생성')    
     arg_parser.add_argument('--dir_path', type=str, required=True, help='Path to directory for recordings and outputs.')
     arg_parser.add_argument('--test_signal', type=str, default=argparse.SUPPRESS,
                             help='Path to sine sweep test signal or pickled impulse response estimator.')
