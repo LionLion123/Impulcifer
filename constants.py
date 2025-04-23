@@ -2,7 +2,6 @@
 
 from utils import versus_distance
 
-# https://en.wikipedia.org/wiki/Surround_sound
 SPEAKER_NAMES = ['FL', 'FR', 'FC', 'BL', 'BR', 'SL', 'SR', 'WL', 'WR', 'TFL', 'TFR', 'TSL', 'TSR', 'TBL', 'TBR']
 
 SPEAKER_PATTERN = f'({"|".join(SPEAKER_NAMES + ["X"])})'
