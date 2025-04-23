@@ -169,16 +169,39 @@ Therefore, the high-pass filter applied around 10–22 Hz has been bypassed.
 -----------------------------------------------
 
 ### 6
+![image](https://github.com/user-attachments/assets/152603cd-8ba4-401d-aa08-b9594ac20881)
+![image](https://github.com/user-attachments/assets/e022b813-4e93-41e5-862c-c04499b66ec3)
+
 --jamesdsp 인수를 입력하면 바로 제임스Dsp 앱에 사용할수있는 트루스테레오 IR파일이 만들어집니다. 파일명은 같은 폴더내에 jamesdsp.wav로 저장됩니다.
 
 
 폴더내에 FL,FR.wav를 제외한 다른 채널들의 파일이 있더라도, --jamesdsp를 입력하면 FL,FR만을 기준으로 정규화되어 스테레오 파일을 따로 만듭니다.
 
 
-When you supply the --jamesdsp argument, a TrueStereo IR file ready for use in the JamesDSP app is generated immediately. The file is saved in the same folder under the name jamesdsp.wav.
+When you specify the --jamesdsp argument, a TrueStereo IR file ready for use in the JamesDSP app is generated immediately. The file is saved in the same folder under the name jamesdsp.wav.
 
 
 Even if the folder contains files for channels other than FL.wav and FR.wav, using --jamesdsp will normalize based only on FL and FR and produce a separate stereo file.
+
+
+-----------------------------------------------
+
+### 7
+![image](https://github.com/user-attachments/assets/f9f597ee-fc3e-4c37-91d4-fffa9ea93839)
+![image](https://github.com/user-attachments/assets/e6b1b68e-040e-44d4-aecc-8ea7e47019f9)
+![image](https://github.com/user-attachments/assets/4a53811a-e294-4089-ac03-a6d72f14b9cd)
+
+
+--hangloose 인수를 입력하면 바로 Hangloose Convolver에  사용할수있는 각 채널 스테레오 IR파일들이 Hangloose라는 새로운 폴더에 만들어집니다.
+
+
+LFE용 응답은 FLFR에 로우패스를 적용하여 만들어집니다.
+
+
+When you specify the --hangloose argument, stereo IR files for each channel that can be used with the Hangloose Convolver are generated immediately in a new folder named “Hangloose.”
+
+The LFE response is created by applying a low-pass filter to the FL and FR channels.
+
 
 
 -----------------------------------------------
