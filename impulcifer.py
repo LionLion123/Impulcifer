@@ -86,8 +86,7 @@ def main(dir_path=None,
     print('Opening binaural measurements...')
     hrir = open_binaural_measurements(estimator, dir_path)
 
-    # Write info and stats in readme
-    write_readme(os.path.join(dir_path, 'README.md'), hrir, fs)
+    readme = write_readme(os.path.join(dir_path, 'README.md'), hrir, fs)
 
     if plot:
         # Plot graphs pre processing
@@ -191,6 +190,7 @@ def main(dir_path=None,
     # Write multi-channel WAV file with HeSuVi track order
     hrir.write_wav(os.path.join(dir_path, 'hesuvi.wav'), track_order=HESUVI_TRACK_ORDER)
 
+    print(readme)
 
 
     if jamesdsp:
