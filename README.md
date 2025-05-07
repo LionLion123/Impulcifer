@@ -199,6 +199,27 @@ When you specify the --hangloose argument, stereo IR files for each channel that
 
 
 -----------------------------------------------
+
+### 8
+![image](https://github.com/user-attachments/assets/33840a8e-b244-4ab4-ab63-a75a406fd39c)
+
+
+적용된 노멀라이즈 게인이 표시됩니다. 그리고 Readme의 내용들도 바로 표시됩니다.
+
+
+REW로 직접 확인하는 것이 정확하지만, Readme 파일보며 간단하게 확인하고 싶을때도 있으니까요.
+
+
+하지만 매번 Readme txt파일을 찾아서 여는 것 또한 번거롭기때문에 같이 표시되도록 했습니다.
+
+
+The applied normalized gain is displayed, and the contents of the Readme are shown immediately as well.
+
+
+While checking directly in REW is more accurate, sometimes you just want a quick glance at the Readme. But having to locate and open the Readme txt file each time is tedious, so I’ve made it so they’re displayed together.
+
+
+-----------------------------------------------
 # Items under Consideration # 고려하고 있는 부분들
 -----------------------------------------------
 
