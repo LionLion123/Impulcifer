@@ -529,6 +529,26 @@ def write_readme(file_path, hrir, fs):
         headers=['Speaker', 'Side', 'PNR', 'ITD', 'Length', rt_name],
         tablefmt='github'
     )
+
+        # --- 메인 귀 채널별 반사음 에너지(20–50 ms, 50–150 ms) 계산 ---
+    frame    = lambda ms: int(ms * 1e-3 * fs)
+    to_db    = lambda E, E0: 10 * np.log10(E / (E0 + 1e-20))
+    energy_lines = ["\n**직접음 대비 반사음 에너지 (채널별, dB):**"]
+    for speaker, channels in hrir.irs.items():
+        # 스피커 이름 끝이 L이면 left, 아니면 right 채널만
+        main_side = 'left' if speaker.endswith('L') else 'right'
+        data      = channels[main_side].data
+        peak      = np.argmax(np.abs(data))
+        E0        = np.sum(data[peak : peak + frame(5)]**2)
+        E_early   = np.sum(data[peak + frame(20) : peak + frame(50)]**2)
+        E_mid     = np.sum(data[peak + frame(50) : peak + frame(150)]**2)
+        energy_lines.append(
+            f"- {speaker} ({main_side}): "
+            f"Early (20–50 ms) {to_db(E_early, E0):.2f} dB, "
+            f"Mid (50–150 ms) {to_db(E_mid,   E0):.2f} dB"
+        )
+    energy_str = "\n" + "\n".join(energy_lines)
+
     s = f'''# HRIR
 
     **Date:** {datetime.now().strftime('%Y-%m-%d %H:%M')}  
@@ -536,10 +556,11 @@ def write_readme(file_path, hrir, fs):
     **Output sampling rate:** {fs} Hz  
 
     {table_str}
+    {energy_str}
     '''
     s = re.sub('\n[ \t]+', '\n', s).strip()
 
-    with open(file_path, 'w') as f:
+    with open(file_path, 'w', encoding='utf-8') as f:
         f.write(s)
 
     return s
