@@ -223,7 +223,7 @@ While checking directly in REW is more accurate, sometimes you just want a quick
 ![image](https://github.com/user-attachments/assets/907c5ef0-c8fb-411c-b848-b374308ae907)
 
 
-직접음 대비 20~50ms의 초기반사 레벨과 50~150ms 반사 레벨을 표시합니다.
+직접음 대비 20-50ms의 초기반사 레벨과 50-150ms 반사 레벨을 표시합니다.
 
 
 davidgriesinger의 연구에 따르면 공간지각 스트림은 약 50ms를 분기점으로 삼으며 50ms이전엔 전경, 이후부턴 배경스트림으로 자극되어 인지됩니다.
