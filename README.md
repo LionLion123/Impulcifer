@@ -219,6 +219,21 @@ The applied normalized gain is displayed, and the contents of the Readme are sho
 While checking directly in REW is more accurate, sometimes you just want a quick glance at the Readme. But having to locate and open the Readme txt file each time is tedious, so I’ve made it so they’re displayed together.
 
 
+### 9
+![image](https://github.com/user-attachments/assets/907c5ef0-c8fb-411c-b848-b374308ae907)
+
+
+직접음 대비 20~50ms의 초기반사 레벨과 50~150ms 반사 레벨을 표시합니다.
+
+
+davidgriesinger의 연구에 따르면 공간지각 스트림은 약 50ms를 분기점으로 삼으며 50ms이전엔 전경, 이후부턴 배경스트림으로 자극되어 인지됩니다.
+
+
+다만 50ms~150ms의 에너지는 음표가 끝나기전(음표의 길이 약 200ms)에 과도하게 남아있다면 명료도를 크게 해치게 됩니다.
+
+
+따라서 50~150ms의 에너지는 최소화하며 전체 RT의 길이를 낮은 레벨로 길게 가져가는 것이 올바른 공간 확장의 예시중 하나입니다.
+
 -----------------------------------------------
 # Items under Consideration # 고려하고 있는 부분들
 -----------------------------------------------
