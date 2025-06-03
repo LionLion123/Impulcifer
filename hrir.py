@@ -391,6 +391,65 @@ class HRIR:
 
 
 
+    def adjust_itd(self, mode: str = 'off'):
+
+        if mode == 'off':
+            return
+
+        def shift(sig: np.ndarray, samples: int) -> np.ndarray:
+            """Length-preserving shift.  +samples ⇒ delay, −samples ⇒ advance."""
+            if samples == 0:
+                return sig
+            n = len(sig)
+            if samples > 0:                                # delay
+                return np.concatenate((np.zeros(samples, sig.dtype), sig))[:n]
+            else:                                          # advance
+                samples = -samples
+                return np.concatenate((sig[samples:], np.zeros(samples, sig.dtype)))
+
+        # Speaker pairs to process (left-hand, right-hand)
+        pairs = [
+            ('FL', 'FR'), ('SL', 'SR'), ('BL', 'BR'), ('WL', 'WR'),
+            ('TFL', 'TFR'), ('TSL', 'TSR'), ('TBL', 'TBR')
+        ]
+
+        for sp_left, sp_right in pairs:
+            if sp_left not in self.irs or sp_right not in self.irs:
+                continue
+
+            # Identify the *contralateral* channel for each speaker
+            con_left  = self.irs[sp_left ]['right'] if sp_left .endswith('L') else self.irs[sp_left ]['left']
+            con_right = self.irs[sp_right]['left' ] if sp_right.endswith('R') else self.irs[sp_right]['right']
+
+            p_left  = con_left .peak_index()
+            p_right = con_right.peak_index()
+            Δ = p_right - p_left                                   # + ⇒ right later
+            if Δ == 0:
+                continue
+
+            if mode == 'e':                                        # early wins
+                if Δ > 0:                                          # right later
+                    con_right.data = shift(con_right.data, -Δ)
+                else:                                              # left later
+                    con_left .data = shift(con_left .data,  Δ)
+
+            elif mode == 'l':                                      # late wins
+                if Δ > 0:                                          # right later
+                    con_left .data = shift(con_left .data,  Δ)
+                else:                                              # left later
+                    con_right.data = shift(con_right.data, -Δ)
+
+            elif mode == 'a':                                      # average
+                half = abs(Δ) // 2
+                if Δ > 0:                                          # right later
+                    con_left .data = shift(con_left .data,  half)   # delay early
+                    con_right.data = shift(con_right.data, -half)   # advance late
+                else:                                              # left later
+                    con_left .data = shift(con_left .data, -half)
+                    con_right.data = shift(con_right.data,  half)
+
+            else:
+                raise ValueError(f'Unknown ITD mode “{mode}”')
 
 
  
