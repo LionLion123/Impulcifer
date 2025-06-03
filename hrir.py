@@ -6,6 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal, fftpack
 from scipy.signal import correlate
+from numpy.fft import fft, ifft
+from scipy.signal import windows
 from PIL import Image
 from autoeq.frequency_response import FrequencyResponse
 from impulse_response import ImpulseResponse
@@ -280,6 +282,23 @@ class HRIR:
             if sp1 not in self.irs or sp2 not in self.irs:
                 continue
 
+            if sp1 == sp2:
+                data_L = self.irs[sp1]['left' ].data[:seg_len]
+                data_R = self.irs[sp1]['right'].data[:seg_len]
+
+                corr  = correlate(data_L, data_R, mode='full')
+                lags  = np.arange(-len(data_L)+1, len(data_L))
+                lag   = lags[np.argmax(corr)]
+
+                if   lag > 0:   # left leads → delay right
+                    d = self.irs[sp1]['right'].data
+                    self.irs[sp1]['right'].data = np.concatenate((np.zeros(lag), d))[:len(d)]
+                elif lag < 0:   # right leads → delay left
+                    d = self.irs[sp1]['left'].data
+                    self.irs[sp1]['left' ].data = np.concatenate((np.zeros(-lag), d))[:len(d)]
+
+                continue
+
             data1 = self.irs[sp1]['left'].data[:seg_len]
             data2 = self.irs[sp2]['right'].data[:seg_len]
 
@@ -300,7 +319,75 @@ class HRIR:
                     padded = np.concatenate((np.zeros(neg), d))[:len(d)]
                     self.irs[sp1][side].data = padded
                     
+    def align_onset_groups_peak_leftref(self, groups=None):
+        """
+        Align on “left-channel peak” across speaker groups, keeping each
+        L/R pair intact.
 
+        • We take only each speaker’s left-channel peak_index() as the
+        group’s onset.  (We do NOT inspect the right channel for timing.)
+        • FL is the fixed reference (using FL’s left channel).
+        • Every speaker’s left+right channels move by the same integer shift.
+        """
+        if groups is None:
+            groups = [
+                ('FL','FR'), ('SL','SR'), ('BL','BR'), ('WL','WR'),
+                ('TFL','TFR'), ('TSL','TSR'), ('TBL','TBR'), ('FC',)
+            ]
+
+        fs = self.fs
+
+        # Get left-channel peak index of a “group” by looking only
+        # at the first element’s left channel (or, if group has >1 speaker,
+        # they should be “left” side names first anyway).
+        def group_left_peak(grp):
+            # grp is a tuple like ('FL','FR') or ('FC',)
+            # We always use the first speaker name in grp to grab its left channel.
+            sp = grp[0]
+            if sp not in self.irs:
+                return None
+            return self.irs[sp]['left'].peak_index()
+
+        # Reference is FL’s left channel
+        ref_grp = ('FL','FR')
+        ref_peak = group_left_peak(ref_grp)
+        if ref_peak is None:
+            raise RuntimeError("Cannot find FL’s left channel—reference missing!")
+
+        for grp in groups:
+            if grp == ref_grp:
+                continue
+
+            gp = group_left_peak(grp)
+            if gp is None:
+                # this entire group does not exist in self.irs → skip
+                continue
+
+            # positive shift → group is “later” than FL; negative → “earlier”
+            shift = gp - ref_peak
+
+            # move each speaker in this group by the same shift
+            for sp in grp:
+                if sp not in self.irs:
+                    continue
+                for side in ('left','right'):
+                    data = self.irs[sp][side].data
+                    n = len(data)
+
+                    if shift > 0:
+                        # group is late → chop off `shift` samples at front, pad zeros at end
+                        trimmed = data[shift:]
+                        if len(trimmed) < n:
+                            trimmed = np.pad(trimmed, (0, n - len(trimmed)))
+                        self.irs[sp][side].data = trimmed
+
+                    elif shift < 0:
+                        # group is early → prepend |shift| zeros, then trim back to length n
+                        delay = -shift
+                        padded = np.concatenate((np.zeros(delay), data))[:n]
+                        self.irs[sp][side].data = padded
+
+                    # if shift == 0, do nothing (already aligned)
 
 
 
