@@ -6,6 +6,8 @@ global copy
 import copy as _copy 
 from scipy.signal import butter, lfilter
 import argparse
+import sys, re
+from scipy.signal import windows 
 from tabulate import tabulate
 from datetime import datetime
 import numpy as np
@@ -18,6 +20,20 @@ from room_correction import room_correction
 from utils import sync_axes, save_fig_as_png
 from constants import SPEAKER_NAMES, SPEAKER_LIST_PATTERN, HESUVI_TRACK_ORDER
 
+def parse_early_args(arg_list):
+    """
+    unknown_args(리스트)에서 --early{start}_{end}={gain_db} 패턴을 찾아
+    [(start_ms, end_ms, gain_db), ...] 리스트로 반환합니다.
+    """
+    pattern = re.compile(r'^--early(\d+)_(\d+)=(-?\d+\.?\d*)$')
+    wins = []
+    for arg in arg_list:
+        m = pattern.match(arg)
+        if m:
+            wins.append((int(m.group(1)),
+                         int(m.group(2)),
+                         float(m.group(3))))
+    return wins
 
 def main(dir_path=None,
          test_signal=None,
@@ -40,7 +56,8 @@ def main(dir_path=None,
          head_ms=1,
          jamesdsp=False,
          hangloose=False,
-         do_equalization=True):
+         do_equalization=True,
+         early_windows=None):
     """"""
     if dir_path is None or not os.path.isdir(dir_path):
         raise NotADirectoryError(f'Given dir path "{dir_path}"" is not a directory.')
@@ -103,8 +120,58 @@ def main(dir_path=None,
                         ('FC','FC'), ('WL','WR')],
         segment_ms=30
     )
+    hrir.align_onset_groups_peak_leftref()
     hrir.crop_tails()
 
+
+    if early_windows:
+        print('→ Applying early-window gain adjustments...')
+        for start_ms, end_ms, gain_db in early_windows:
+            for speaker, pair in hrir.irs.items():
+                for side, ir in pair.items():
+                    data = ir.data       # 원본 배열 참조
+                    fs   = ir.fs
+
+                # 1) ITD 샘플 차이 계산
+                    itd = abs(pair['left'].peak_index()
+                              - pair['right'].peak_index())
+
+                # 2) cross-channel 판정
+                    is_cross = ((side=='right' and speaker.endswith('L')) or
+                                (side=='left'  and speaker.endswith('R')))
+
+                # 3) aligned 배열 준비
+                    if is_cross:
+                        # cross-channel: 앞당겨서 복사본 생성
+                        aligned = np.roll(data, -itd)
+                    else:
+                        # direct channel: 원본 배열 그대로 사용
+                        aligned = data
+
+                    # 4) 윈도우 구간 계산
+                    s = int(start_ms * fs / 1000)
+                    e = int(end_ms   * fs / 1000)
+                    N = e - s
+
+                    # 5)
+                    alpha = 0.5      # 조절값: 0 < alpha < 1. 작을수록 더 플랫
+                    w = windows.tukey(N, alpha=alpha, sym=False)
+                    g = 10**(gain_db / 20)
+                    k = g - 1
+
+                    # 6) 부드러운 가감산 적용
+                    segment = aligned[s:e]
+                    aligned[s:e] = segment + k * w * segment
+
+                    # 7) 결과를 ir.data에 반영
+                    if is_cross:
+                        # cross-channel: 다시 원위치로 롤 복원
+                        ir.data = np.roll(aligned, itd)
+                    else:
+                        # direct: aligned가 data alias이므로 이미 in-place로 반영됨
+                        ir.data = aligned
+
+ 
   # 디버깅용 responses.wav 출력
     hrir.write_wav(os.path.join(dir_path, 'responses.wav'))
 
@@ -215,7 +282,6 @@ def main(dir_path=None,
         dsp_hrir.write_wav(out_path, track_order=jd_order)
 
     if hangloose:
-        import numpy as np
         from scipy.io import wavfile
 
         output_dir = os.path.join(dir_path, 'hangloose')
@@ -567,6 +633,8 @@ def write_readme(file_path, hrir, fs):
 
 
 def create_cli():
+    import argparse
+
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('--c', type=float, default=1,
                             help='Retain headroom in milliseconds before the impulse peak. Default is 1 ms.')
@@ -640,7 +708,10 @@ def create_cli():
                                  'frequency response. 1 dB/octave will produce nearly 10 dB difference in '
                                  'desired value between 20 Hz and 20 kHz. Tilt is applied with bass boost and both '
                                  'will affect the bass gain.')
-    args = vars(arg_parser.parse_args())
+    
+    known_args, unknown_args = arg_parser.parse_known_args()
+    args = vars(known_args)
+
     if 'bass_boost' in args:
         bass_boost = args['bass_boost'].split(',')
         if len(bass_boost) == 1:
@@ -667,6 +738,8 @@ def create_cli():
     if  'c' in args:
         args['head_ms'] = args['c']
         del args['c']
+
+        args['early_windows'] = parse_early_args(unknown_args)
     return args
 
 
