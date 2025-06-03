@@ -57,6 +57,7 @@ def main(dir_path=None,
          jamesdsp=False,
          hangloose=False,
          do_equalization=True,
+         itd='off',
          early_windows=None):
     """"""
     if dir_path is None or not os.path.isdir(dir_path):
@@ -121,6 +122,11 @@ def main(dir_path=None,
         segment_ms=30
     )
     hrir.align_onset_groups_peak_leftref()
+
+    if itd != 'off':
+        print(f'Adjusting ITD ({itd})…')
+        hrir.adjust_itd(itd)
+
     hrir.crop_tails()
 
 
@@ -708,6 +714,10 @@ def create_cli():
                                  'frequency response. 1 dB/octave will produce nearly 10 dB difference in '
                                  'desired value between 20 Hz and 20 kHz. Tilt is applied with bass boost and both '
                                  'will affect the bass gain.')
+    arg_parser.add_argument(
+    '--itd', type=str, choices=['e', 'l', 'a', 'off'], default='off',
+    help='Inter-aural time-difference handling: '
+         'e=early, l=late, a=average, off=disabled (default).')
     
     known_args, unknown_args = arg_parser.parse_known_args()
     args = vars(known_args)
