@@ -13,6 +13,27 @@ Impulcifer는 Jaakko Pasanen의 소프트웨어입니다.
 
 
 대부분은 GPT의 도움을 받아 직접 실행해보며 문제없는 부분만 반영합니다.
+-----------------------------------------------
+https://drive.google.com/drive/folders/1UoZWQVNONW1GSoxIb7BUwvGqxR82zGv6
+이 파일은 SDC 회원님이 제작해주셨습니다. 감사드립니다.
+
+
+애트모스 스윕 파일입니다. 파일은 48kHz trueHD, 윈도우/팟플레이어에서 재생됨을 확인
+
+
+사용법은 기존 impulcifer 스윕파일과 동일하게 재생하면 AVR atmos 유저도 한번에 높이채널까지 녹음이 가능합니다.
+
+
+1. 11cmaster 파일; 7.0.4 채널 
+
+
+FL - FR - C - BL - BR - SL - SR - TFL - TFR - TBL - TBR
+
+
+2. 13cmaster 파일; 7.0.6 채널 (로직 프로 렌더러의 한계로 TS가 잘 나오는지 확인은 못함)
+
+
+FL - FR - C - BL - BR - SL - SR - TFL - TFR - TSL - TSR - TBL - TBR
 
 
 -----------------------------------------------
