@@ -14,13 +14,6 @@ Impulcifer는 Jaakko Pasanen의 소프트웨어입니다.
 
 대부분은 GPT의 도움을 받아 직접 실행해보며 문제없는 부분만 반영합니다.
 
-Impulcifer is a software developed by Jaakko Pasanen.
-After many years of experimenting with HRIR/BRIR, I came up with quite a few ideas, experienced some inconveniences, and encountered a few issues.
-
-However, since the developer is currently busy, I decided to create this version to share the features I want with Korean users.
-
-For the most part, I execute it myself with GPT’s help and only apply the parts that work without issues.
-
 
 -----------------------------------------------
 # Changes # 변경사항
@@ -34,14 +27,6 @@ cavern의 소프트웨어+VBcable 16ch로 Atmos 및 높이채널 업믹스에 �
 
 (hrir.wav의 순서를 그대로 사용하면 되기때문에 hrir.wav는 순서에 맞게 하였고, hesuvi.wav는 제가 쓰기 편하게끔 해놨습니다. 어차피 hesuvi코드로는 16채널이 되지않기때문에 직접 코드를 작성해야합니다.)
 
-By combining Cavern's software with VB-Cable 16ch, the usability for Atmos and height channel upmixing has been greatly expanded.
-
-
-Therefore, it now supports processing of WL, WR.wav / TFL, TFR.wav / TSL, TSR.wav / TBL, TBR.wav.
-
-
-(Since the original order of hrir.wav can be used as-is, I arranged hrir.wav accordingly. As for hesuvi.wav, I customized it for easier personal use.
-In any case, since HeSuVi’s code does not support 16 channels, the code must be written manually.)
 
 -----------------------------------------------
 
@@ -56,13 +41,6 @@ In any case, since HeSuVi’s code does not support 16 channels, the code must b
 
 그러한 부분은 정위감,선명도의 하락으로 이어지며 그에 대한 정렬이 확실하게 적용될수있도록 변경했습니다.
 
-(In the example image, the top shows the original code, and the bottom shows the revised code.)
-
-
-Impulse peak detection is excellent, but sometimes it alters the timing of impulses that are actually fine.
-
-
-This leads to a degradation in localization and clarity, so I made adjustments to ensure proper alignment is consistently applied.
 
 -----------------------------------------------
 
@@ -82,18 +60,6 @@ This leads to a degradation in localization and clarity, so I made adjustments t
 바이노럴 기준으로 96000샘플레이트 기준 10us까지도 사람은 인지할수있으며 이것을 재생단에서 굳이 딜레이를 추가할 이유가 없기때문에 비활성화합니다.
 
 
-(In the example image, the upper part shows the original code, and the lower part shows the modified code applied. It intentionally assigns the same channel under a different name as a surround channel to illustrate that, since it’s the same channel to begin with, its delay must be identical.)
-
-
-I disabled delay and gain adjustments between surround channels.
-
-
-In ideal immersive audio setups, it’s often recommended that channels be matched with extremely fine precision—this becomes even more critical at close listening distances (around 1 meter).
-
-
-In binaural playback, humans can perceive differences as small as 10 microseconds at a 96kHz sample rate,
-so there’s no reason to add delay during playback—hence, the feature is disabled.
-
 -----------------------------------------------
 
 ### 4 
@@ -109,16 +75,6 @@ SOTA 기준을 충족시키는 DRC를 잘 적용한다면 대부분의 사전링
 
 따라서 사용자가 원할수 있게끔 사전딜레이 인수 옵션을 넣었습니다.
 
-I added an option to set the windowing for pre-peak truncation by using --c=10 or --c=50 (in milliseconds). If no argument is provided, a default value will be applied.
-
-
-While a well-implemented DRC that meets SOTA standards can suppress most pre-ringing, it's still essential to ensure a minimum amount of pre-delay.
-
-
-Moreover, when performing XTC processing such as Bacch, pre-response must be properly secured for it to function correctly.
-
-
-Therefore, I included a pre-delay argument option so that users can adjust it as needed.
 
 -----------------------------------------------
 
@@ -147,25 +103,6 @@ Therefore, I included a pre-delay argument option so that users can adjust it as
 따라서 약 10-22hz에 적용되는 하이패스를 우회합니다.
 
 
-The high-pass filter is bypassed.
-
-
-In the default behavior of Impulcifer, a high-pass filter is applied (around 10–22 Hz).
-
-
-Most headphones used for binaural virtualization cannot accurately reproduce ultra-low frequencies,
-so the developer’s intention to prevent unnecessary low-frequency boost is understandable.
-
-
-However, advanced users who delve deeper and aim to create immersive virtual spaces generally do not want their frequency response to be arbitrarily altered.
-
-
-Furthermore, since DRC is already applied based on an ideal minimum-phase (DC-removed) room response, there's no concern regarding low-frequency anomalies.
-
-
-Therefore, the high-pass filter applied around 10–22 Hz has been bypassed.
-
-
 -----------------------------------------------
 
 ### 6
@@ -176,12 +113,6 @@ Therefore, the high-pass filter applied around 10–22 Hz has been bypassed.
 
 
 폴더내에 FL,FR.wav를 제외한 다른 채널들의 파일이 있더라도, --jamesdsp를 입력하면 FL,FR만을 기준으로 정규화되어 스테레오 파일을 따로 만듭니다.
-
-
-When you specify the --jamesdsp argument, a TrueStereo IR file ready for use in the JamesDSP app is generated immediately. The file is saved in the same folder under the name jamesdsp.wav.
-
-
-Even if the folder contains files for channels other than FL.wav and FR.wav, using --jamesdsp will normalize based only on FL and FR and produce a separate stereo file.
 
 
 -----------------------------------------------
@@ -195,10 +126,8 @@ Even if the folder contains files for channels other than FL.wav and FR.wav, usi
 --hangloose 인수를 입력하면 바로 Hangloose Convolver에  사용할수있는 각 채널 스테레오 IR파일들이 Hangloose라는 새로운 폴더에 만들어집니다.
 
 
-When you specify the --hangloose argument, stereo IR files for each channel that can be used with the Hangloose Convolver are generated immediately in a new folder named “Hangloose.”
-
-
 -----------------------------------------------
+
 
 ### 8
 ![image](https://github.com/user-attachments/assets/33840a8e-b244-4ab4-ab63-a75a406fd39c)
@@ -213,10 +142,7 @@ REW로 직접 확인하는 것이 정확하지만, Readme 파일보며 간단하
 하지만 매번 Readme txt파일을 찾아서 여는 것 또한 번거롭기때문에 같이 표시되도록 했습니다.
 
 
-The applied normalized gain is displayed, and the contents of the Readme are shown immediately as well.
-
-
-While checking directly in REW is more accurate, sometimes you just want a quick glance at the Readme. But having to locate and open the Readme txt file each time is tedious, so I’ve made it so they’re displayed together.
+-----------------------------------------------
 
 
 ### 9
@@ -234,88 +160,151 @@ davidgriesinger의 연구에 따르면 공간지각 스트림은 약 50ms를 분
 
 따라서 50~150ms의 에너지는 최소화하며 전체 RT의 길이를 낮은 레벨로 길게 가져가는 것이 올바른 공간 확장의 예시중 하나입니다.
 
------------------------------------------------
-# Items under Consideration # 고려하고 있는 부분들
------------------------------------------------
-
-### 1
-가끔 처리하다보면 ValueError: cannot convert float NaN to integer 라는 에러가 발생할때가 있습니다.
-
-
-추측으로는 -60db아래 임펄스의 노이즈플로어부분에서 이상한 피크 같은게 있거나 할때 저러는 것 같습니다.
-
-
-대부분의 응답에선 발생하지 않지만 감쇠가 너무 빠른 응답을 재루프백했을 경우에도 종종 그러구요.
-
-
-몇년전 개발자에게 문의했었지만 바쁘기때문에 언젠간 직접 고치는게 나을듯합니다.
-
-
-Sometimes during processing, I encounter an error: ValueError: cannot convert float NaN to integer.
-
-
-I suspect this happens when there’s some strange peak in the noise floor of the impulse below –60 dB.
-
-
-It doesn’t occur in most responses, but it also happens occasionally when re-loopbacking a response with very fast attenuation.
-
-
-I asked the developer about this a few years ago, but since they’re busy, it’s probably better that I fix it myself someday.
 
 -----------------------------------------------
 
 
-### 2
-impulcifer의 채널밸런스 기능과는 별개로 녹음당시에 마이크착용,삽입깊이등의 편차로 인한 경우에는 왼쪽채널, 오른쪽채널이 아니라 왼쪽귀, 오른쪽귀 응답을 보정해야합니다.
-
-FL-L,FR-L / FR-R,FL-R 이렇게 말이죠. 이 기능을 REW의 MTW개념을 섞어서 극도로 짧은 게이팅을 대역별로 다르게 적용하여 착용 편차만을 보정하는 것은 REW에서 충분히 가능합니다.
-
-이 부분을 impulcifer 내부에도 적용시킬까 고민중입니다.
+### 10
+![image](https://github.com/user-attachments/assets/51e6319c-6bd5-4cce-920a-d180bdcdda6d)
+![image](https://github.com/user-attachments/assets/199d1ad6-ee10-44da-bcfc-97eaf253a02e)
 
 
-Separately from Impulcifer’s channel balance function, when there are deviations in microphone placement or insertion depth during recording, you need to correct for left‑ear and right‑ear responses rather than left‑channel and right‑channel.
+응답을 보다보면 센터채널도 종종 이상할때가 있습니다.
+
+기존 좌우페어매칭에 센터는 미포함이였기에 포함시켰습니다.
 
 
-In other words, FL‑L, FR‑L / FR‑R, FL‑R. In REW, it’s entirely possible to compensate solely for fit deviations by combining the MTW concept and applying ultrashort gating differently across frequency bands.
+![image](https://github.com/user-attachments/assets/c68d0037-6e3d-423d-80a3-826aedcf391b)
 
 
-I’m considering applying this approach within Impulcifer as well.
+또한 채널별 시작타이밍도 일단은 적용했습니다.
 
 
------------------------------------------------
-### 3
-BacchORC와 같은 바이노럴 룸보정(DRC) 기능을 적용해볼까 싶은 생각도 하고있습니다.
+피크 정렬이랑 교차상관 둘다 경우에 따라 다른 결과를 보여줬는데, 대부분 피크 정렬이 좀더 나은 결과를 보여줬기에 피크정렬을 사용합니다.
 
-impulcifer에 룸파일, 타겟등을 적용하여 룸이큐를 처리되게끔 할수도 있지만, 그것과는 별개로 바이노럴의 특징을 고려하여 개인의 좌우 신체편차를 보정하고
-
-더 나아가 각 스피커 각도에서 필연적으로 발생하는 귓바퀴의 착색을 DF(혹은 룸게인 가중치가 부여된 타겟)에 맞게 교정하여, 결과적으로 투명함을 얻을수 있고 스피커가 본질적으로 사라지게 됩니다.
-
-(스피커와 룸, 그리고 귓바퀴의 착색이 스피커가 있다는 것을 인지하게 하는 요소들입니다.)
-
-다만 이건 개인마다 DF의 차이가 분명히 존재하고, 개인마다 녹음 방법이 정확히 같지않기때문에 어떻게 공용화해서 적용시킬지는 고민중입니다.
-
-
-I’m also considering applying a binaural room correction (DRC) function like BacchORC.
-
-
-While it’s possible to process room EQ in Impulcifer by applying room files and targets, separately, by taking binaural characteristics into account, you can correct for individual left‑right anatomical variations and, furthermore, correct pinna coloration that inevitably occurs at each speaker angle to match the DF (or a target with room‑gain weighting). The result is transparency, effectively making the speakers disappear.
-
-
-(The speaker, the room, and pinna coloration are the elements that make us aware of the presence of speakers.)
-
-
-However, since DF differences clearly exist among individuals and recording methods aren’t exactly the same for everyone, I’m pondering how to generalize and apply this.
 
 
 -----------------------------------------------
-### 4
-plot은 초기사용자들에게 나쁘지않은 정보들을 제공해주지만 기존의 plot들중 대부분은 잘 보지않게 되었고, 결국은 REW를 사용하여 확인합니다.
 
 
-BRIR사용자들에 제일 도움이 될만한 간단한 그래프는 일단 양이응답 임펄스 오버레이형태이지않을까 싶습니다. 더나아가 ILD,IPD,IACC,ETC 등의 지표도 같이 보여주면 좋을 것 같습니다. 
+### 11
+![image](https://github.com/user-attachments/assets/67652815-f8d7-482c-83e9-3663a4724f1c)
+이렇게 ITD가 틀어진 응답이 있다하면
 
 
-Plots provide useful information for novice users, but most of the existing plots are seldom viewed, and users ultimately use REW to verify.
+![image](https://github.com/user-attachments/assets/deecfc0e-be84-4411-9306-1a28b736042c)
+![image](https://github.com/user-attachments/assets/5cbbdb8f-a931-4c18-ab72-5ff69bc273f1)
+--itd=e 옵션일때엔
 
 
-The simplest graph that would be most helpful for BRIR users would probably be a stereo impulse response overlay. Furthermore, it would be beneficial to also display metrics such as ILD, IPD, IACC, and ETC.
+early 이른쪽에 느린쪽을 땡겨오고
+
+
+![image](https://github.com/user-attachments/assets/b8c36615-02d4-426b-81ef-1ec2983befe5)
+![image](https://github.com/user-attachments/assets/7944a450-a972-4bc9-bd61-d8aa894cd9cb)
+
+
+--itd=l 옵션일땐
+
+late 느린쪽에 이른쪽을 땡겨오고
+
+
+![image](https://github.com/user-attachments/assets/3c0ff3e6-e96b-4788-9e9b-079b58a052c8)
+![image](https://github.com/user-attachments/assets/5fabca92-17d1-46c7-9541-eb1d0f1fd75f)
+
+
+--itd=a 를 사용했을땐
+
+avg 평균에 각각 밀고 땡겨오게 됩니다.
+
+
+기본값은 비활성이고, --itd=a 와 같이 원하는 옵션을 적용할수있습니다.(a, e, l)
+
+
+근데 이게 잘 생각해봐야 하는게
+
+
+공통지연이 틀어져서 한쪽으로 쏠리면 당연히 쏠려서 들리는건 맞아서 그게 거슬리긴 하는데 (현실에선 실시간 뇌보정으로 커버가 되지만)
+
+
+얘가 틀어졌든 아니든 얼굴,몸이 돌아가있는 기준으론 정확한? 응답이라서
+
+
+건드는 순간부터 지각되는 스펙트럼이 개선 혹은 복구가 될수도 있지만 오히려 더 캔슬이 나듯 물먹은듯한 소리도 날수있다는점
+
+
+고음은 저음에 비해 ITD에 "덜" 의존하긴하지만 테스트톤에 따라서 그 차이가 제법 나기도 해서
+
+
+심한경우엔 거리감, 깊이감이 압축되기도 하기때문에
+
+
+1~2샘플정도면 건드려도 괜찮고 (20~40us 차이정도)
+
+
+그 이상의 차이면(예를들어 한쪽귀는250us, 반대채널은 333us) 녹음을 다시하는걸 권장합니다요.
+
+
+그리고 또 한가지 저게 정확하지 않을수 있는게 반대귀 채널은 초고음 스펙트럼이 보통 무딘 상태라서
+
+
+단순히 피크만 보고 정렬하기엔 혼란이 있을수도 있기때문에
+
+
+먼저 듣고나서, 바꿔보고 또 들어보고 판단해보시는게 좋을듯 합니다.
+
+
+제일 좋은건 처리에 의존하지않고, 녹음때 잘 녹음하는 것이 좋습니다.
+
+
+-----------------------------------------------
+
+
+### 11
+
+가상 베이스 기능이 추가되었습니다.
+
+
+![image](https://github.com/user-attachments/assets/bb77da45-97ce-4576-8a8a-396b3ffa16ea)
+
+
+응답암거나 가져왔을때 이런 모습 (명령어 x)
+
+
+![image](https://github.com/user-attachments/assets/80b0b6b5-ff47-4edb-a492-8f378448a268)
+
+
+여기에 -vbass=200을 적용했을때
+
+
+![image](https://github.com/user-attachments/assets/c70ec485-ef3a-413c-860d-72eb6b06a2a1)
+![image](https://github.com/user-attachments/assets/5a764c41-2ef7-4264-8a3b-2c99787ef7e9)
+
+
+이렇게 200Hz를 기준으로 크로스오버를 잡고 저음이 합성됩니다.
+
+
+![image](https://github.com/user-attachments/assets/8366bf7d-9a1a-4180-90d9-b04e1e26816d)
+
+
+물론 프론트말고 모든 채널들 다 적용됩니다. 각 반대귀 채널들은 각각의 ITD에 맞게 합성되며, 이는 각 스피커의 각도별로 ITD가 달라짐을 의미합니다.
+
+
+오랜기간동안 모노bass라는 개념이 존재해왔지만, 제일 좋은건 각도별 스피커들 모두가 각각의 ITD를 가지고 풀레인지로 재생될때가 베스트입니다.
+
+
+가상베이스(15hz 버터워스 4차 필터)에 ILD도 추가되어있고
+
+
+크오는 링크위츠 8차를 사용하는데 최대 200~250hz정도까지, 그 이상은 권장하지않습니다.
+
+
+그냥 서브우퍼 영역만 교체하는거면 -vbass=100으로 해도 되지만요.
+
+
+smyth realizer의 구현이 썩 좋아보이진 않았지만 암튼 딸깍으로 저음합성이 되는 기능이 Impulcifer의 수동 크로스오버와의 차이였는데
+
+
+이젠 저음도 합성이 가능합니다. virtual_bass.py를 다른 py들이 있는 폴더내에 다운받아놓고 --vbass= 만 원할때 입력하면 됩니다.
+
+
