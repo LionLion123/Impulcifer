@@ -13,6 +13,7 @@ from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+from virtual_bass import synthesize_virtual_bass
 from autoeq.frequency_response import FrequencyResponse
 from impulse_response_estimator import ImpulseResponseEstimator
 from hrir import HRIR
@@ -58,6 +59,7 @@ def main(dir_path=None,
          hangloose=False,
          do_equalization=True,
          itd='off',
+         vbass='0',
          early_windows=None):
     """"""
     if dir_path is None or not os.path.isdir(dir_path):
@@ -127,8 +129,16 @@ def main(dir_path=None,
         print(f'Adjusting ITD ({itd})…')
         hrir.adjust_itd(itd)
 
+
+
     hrir.crop_tails()
 
+    if vbass:                               # vbass is an int (0 = disabled)
+        synthesize_virtual_bass(            # call the helper function
+            hrir,
+            xo_hz=vbass,                    # crossover freq from CLI
+            head_ms=head_ms                 # crop-head delay from --c
+        )
 
     if early_windows:
         print('→ Applying early-window gain adjustments...')
@@ -718,6 +728,8 @@ def create_cli():
     '--itd', type=str, choices=['e', 'l', 'a', 'off'], default='off',
     help='Inter-aural time-difference handling: '
          'e=early, l=late, a=average, off=disabled (default).')
+    arg_parser.add_argument('--vbass', type=int, default=0,
+                    help='Enable virtual bass – value is XO freq in Hz (0 = off)')
     
     known_args, unknown_args = arg_parser.parse_known_args()
     args = vars(known_args)
