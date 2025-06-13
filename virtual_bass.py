@@ -100,7 +100,7 @@ def _shift(sig: np.ndarray, delay: int, length: int) -> np.ndarray:
 
 
 def synthesize_virtual_bass(hrir, *, xo_hz: int = 250, head_ms: float = 1.0,
-                            hp_fc: float = 15.0) -> None:
+                            hp_fc: float = 15.0, invert_polarity: bool = False) -> None:
     """Mutate *hrir* in‑place, injecting virtual‑bass split/merge."""
     fs = hrir.fs
 
@@ -162,17 +162,9 @@ def synthesize_virtual_bass(hrir, *, xo_hz: int = 250, head_ms: float = 1.0,
 
         gain = g_global
 
-        # 4b) Determine polarity by looking at whichever ear has the larger peak magnitude.
-        left_peak_idx  = pair["left"].peak_index()
-        right_peak_idx = pair["right"].peak_index()
-        left_val  = pair["left"].data[left_peak_idx]
-        right_val = pair["right"].data[right_peak_idx]
-
-        # Pick sign of the bigger‐magnitude peak, so both ears use the same "pol".
-        if abs(left_val) >= abs(right_val):
-            pol = +1.0 if left_val >= 0 else -1.0
-        else:
-            pol = +1.0 if right_val >= 0 else -1.0
+    # Determine polarity based on the invert_polarity flag.
+        # +1.0 for normal polarity, -1.0 for inverted.
+        pol = -1.0 if invert_polarity else 1.0
 
         # 4c) Create scaled and shaped synth IRs (NEW, CORRECTED LOGIC)
         # First, scale the primary mpbass. This is the direct signal.
