@@ -60,6 +60,7 @@ def main(dir_path=None,
          do_equalization=True,
          itd='off',
          vbass='0',
+         vp=False,
          early_windows=None):
     """"""
     if dir_path is None or not os.path.isdir(dir_path):
@@ -137,7 +138,8 @@ def main(dir_path=None,
         synthesize_virtual_bass(            # call the helper function
             hrir,
             xo_hz=vbass,                    # crossover freq from CLI
-            head_ms=head_ms                 # crop-head delay from --c
+            head_ms=head_ms,                 # crop-head delay from --c
+            invert_polarity=vp              # Pass the polarity flag
         )
 
     if early_windows:
@@ -730,6 +732,8 @@ def create_cli():
          'e=early, l=late, a=average, off=disabled (default).')
     arg_parser.add_argument('--vbass', type=int, default=0,
                     help='Enable virtual bass – value is XO freq in Hz (0 = off)')
+    arg_parser.add_argument('--vp', action='store_true',
+                            help='Invert polarity of the virtual bass signal.')
     
     known_args, unknown_args = arg_parser.parse_known_args()
     args = vars(known_args)
